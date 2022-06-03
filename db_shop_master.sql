@@ -57,7 +57,7 @@ CREATE TABLE `user` (
 );
 
 
-INSERT INTO `user`(`name`, `email`, `password`, `role`) VALUES ('Олег','oleg.lysenko.1993@gmail.com','password','admin'),('Виктор Зинченко','zinchenko.us@gmail.com','222222','admin'),('Сергей','serg@mail.com','111111','');
+INSERT INTO `user`(`name`, `email`, `password`, `role`) VALUES ('Admin','test1@test.com','$2y$10$jl74cWFacxVv8PrBbFZnpO5D6RDM72jQfjyyIlXxKuIJv6uB4pQZS','admin');
 
 DROP TABLE IF EXISTS `product_order`;
 CREATE TABLE `product_order` (
