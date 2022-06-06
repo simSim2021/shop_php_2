@@ -161,6 +161,32 @@ INSERT INTO `product`(`name`, `category_id`, `code`, `price`, `availability`, `b
   ('Клавиатура Беспроводная Logitech K750 WL', 4, 64486, 6900, 1, 'Logitech', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
   ('Клавиатура Apple Magic Trackpad', 4, 64486, 6900, 1, 'Apple', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
   ('Подставка Cooler Master Choiix STASH,карман для 2.5" HDD/SSD,3x-port USB HUB', 4, 64486, 6900, 1, 'CM', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
+  
+  
+  CREATE TABLE `contact` (
+  `contact_id` int(11) NOT NULL,
+  `user_name` varchar(100) NOT NULL,
+  `user_email` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+   CONSTRAINT PRIMARY KEY (`contact_id`)
+);
+
+
+CREATE TABLE `password_reset` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `password_recovery_token` varchar(255) NOT NULL,
+  `expire_at` timestamp NULL DEFAULT NULL,
+  `is_valid` tinyint(4) NOT NULL,
+  `expired_at` timestamp NOT NULL,
+  `create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   CONSTRAINT PRIMARY KEY (`id`),
+   CONSTRAINT FK_user Foreign Key(`user_id`)
+   References user (id)
+
+);
+  
   ('Подставка Cooler Master Choiix MINI AIR THROUGH,4x-port USB Hub,черная', 4, 64486, 6900, 1, 'CM', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
   ('Подставка Cooler Master NotePal U-Lite, 1x100мм fan,черная', 4, 64486, 6900, 1, 'CM', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
   ('Чехол к iPhone 5 Ozaki O!coat-0.3+Canvas Khaki', 4, 64486, 6900, 1, 'Ozaki', 'Горизонтальная прокрутка, Для обеих рук (симметричный дизайн), овместимость с ОС: Mac OS, Microsoft Windows', 0, 1),
