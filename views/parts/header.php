@@ -37,6 +37,7 @@
                 </a></li>
             <li><a href="/cabinet">Кабинет</a></li>
             <li><a href="/user/logout">Выйти</a></li>
+            <li><a href="/forgot_pass/forgot_pass">Изменить пароль</a></li>
         <?php endif;?>
         </ul>
     </div>
