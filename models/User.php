@@ -1,8 +1,25 @@
 <?php
 
 //Модель
+use PHPMailer\PHPMailer\PHPMailer;
+//Require PHP Mailer
+require_once (ROOT . '/PHPMailer/src/PHPMailer.php');
+require_once (ROOT . '/PHPMailer/src/Exception.php');
+require_once (ROOT . '/PHPMailer/src/SMTP.php');
 
 class User {
+
+	public function __construct(){
+			
+		//Setup PHPMailer
+        	$this->mail = new PHPMailer();
+        	$this->mail->isSMTP();
+       		$this->mail->Host = 'smtp.mailtrap.io';
+        	$this->mail->SMTPAuth = true;
+        	$this->mail->Port = 2525;
+        	$this->mail->Username = '086d285e641fb5';
+        	$this->mail->Password = '09c3eb38c18237';
+    }
 
     /*
      * Если в контроллере все ОК, принимаем данные и записываем в БД
@@ -235,23 +252,85 @@ class User {
 	/*
 	 *изменить пароль
 	 */
-	public function reset ($newPwdHash, $tokenEmail){
+	//public function reset ($newPwdHash, $tokenEmail){
         
 
-	$db = Db::getConnection();
+	//$db = Db::getConnection();
 
-	$sql = 'UPDATE user SET password = :password WHERE email = :email';
+	//$sql = 'UPDATE user SET password = :password WHERE email = :email';
         
-	$res = $db->prepare($sql);
-	$res->bindParam(':password', $newPwdHash, PDO::PARAM_STR);
-        $res->bindParam(':email', $tokenEmail, PDO::PARAM_STR);
+	//$res = $db->prepare($sql);
+	//$res->bindParam(':password', $newPwdHash, PDO::PARAM_STR);
+        //$res->bindParam(':email', $tokenEmail, PDO::PARAM_STR);
 
 	//Execute
-        if($res->execute()){
-            return true;
-        }else{
-            return false;
+        //if($res->execute()){
+            //return true;
+        //}else{
+            //return false;
+        //}
+    //}
+
+
+public static function checkPwdForReset(){
+	$stmt = Db::row("SELECT * FROM `user` WHERE `remember_token` = :token", ['token' => $_GET['token']]);
+        if ($stmt) {
+            $time = $stmt['time_token'] + 60*60;
+
+            if ($time > time()) {
+                return $stmt;
+            } else {
+                Db::query("UPDATE `user` SET `remember_token` = null, `time_token` = null WHERE `remember_token` = :token", ['token' => $_GET['token']]);
+                return false;
+            }
         }
+
+        return false;
+     }
+
+public static function updatePwdForReset()
+    {
+        $stmt = Db::query("UPDATE `user` SET `password` = :password, `remember_token` = null, `time_token` = null WHERE `remember_token` = :token", [
+            'token'    => $_GET['token'],
+            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT)
+        ]);
+        return $stmt->rowCount();
     }
+
+public static function createToken()
+    {
+        $stmt = Db::row("SELECT * FROM `user` WHERE `name` = :username", ['username' => $_POST['data']]);
+        if ($stmt) {
+            $token = bin2hex(random_bytes(50));
+            $time  = time();
+
+            $stmt = Db::query("UPDATE `user` SET `remember_token` = '{$token}', `time_token` = '{$time}' WHERE `name` = :username", ['username' => $_POST['data']]);
+            return $token;
+        }
+
+        return false;
+    }
+
+public static function mailPassword($token){
+	
+	$path = "http://{$_SERVER['HTTP_HOST']}";
+	define("PATH", $path);
+
+	$subject = "Reset your password";
+        $message = "<p>We recieved a password reset request.</p>";
+	$message = "<p>Token valid 1 hour.<p>";
+        $message = "<br><p>Here is your password reset link: </p>";
+        $message = "<a href=\"' . PATH . '/reset?token=' . $token . '">http://' . $_SERVER['HTTP_HOST'] . '/reset?token=' . $token . '</a>', 'text/html';
+
+        $this->mail->setFrom('TheShopping@gmail.com');
+        $this->mail->isHTML(true);
+        $this->mail->Subject = $subject;
+        $this->mail->Body = $message;
+        $this->mail->addAddress($email);
+
+        $this->mail->send();
+	$_SESSION['success'][] = 'The letter was sent. Check your Email';
+
+	}
 
 }
