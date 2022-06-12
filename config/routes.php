@@ -24,10 +24,10 @@ return array(
 
    //Запросить email на смену пароля
    //request => controller/action
-    'reset' => 'resetPasswords/sendEmail',
+    'reset' => 'user/reset',
    
    //Сменить пароль
-   'createNewPassword' => 'resetPasswords/reset',
+   'password/reset' => 'user/password',
 
 
     //Личный кабинет
