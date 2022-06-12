@@ -119,7 +119,7 @@ class UserController {
             } else {
                 $_SESSION['error'][] = "Email or Username aren't found";
             }
-	header('Location: /reset/');
+	header('Location: /password/');
             //redirect();
         }
 	require_once(ROOT . '/views/user/password.php');
