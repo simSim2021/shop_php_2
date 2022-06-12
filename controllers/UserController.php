@@ -3,8 +3,25 @@
 /**
  * Class UserController для работы с пользователем
  */
+use PHPMailer\PHPMailer\PHPMailer;
+//Require PHP Mailer
+require_once (ROOT . '/PHPMailer/src/PHPMailer.php');
+require_once (ROOT . '/PHPMailer/src/Exception.php');
+require_once (ROOT . '/PHPMailer/src/SMTP.php');
 
 class UserController {
+
+public function __construct(){
+			
+		//Setup PHPMailer
+        	$this->mail = new PHPMailer();
+        	$this->mail->isSMTP();
+       		$this->mail->Host = 'smtp.mailtrap.io';
+        	$this->mail->SMTPAuth = true;
+        	$this->mail->Port = 2525;
+        	$this->mail->Username = '086d285e641fb5';
+        	$this->mail->Password = '09c3eb38c18237';
+    }
 
     /*
      * Регистрация пользователя
@@ -108,14 +125,32 @@ class UserController {
 
         return true;
     }
-	public function actionPassword()
+
+
+
+
+public function actionPassword()
     {
         if (!empty($_POST)) {
-            $this->validate([
-                'data' => 'required|min:2'
-            ]);
+            User::checkEmail($_POST['email']);
             if ($token = User::createToken()) {
-                User::mailPassword($token);
+               $path = "http://{$_SERVER['HTTP_HOST']}";
+		$subject = "Reset your password";
+        $message = "<p>We recieved a password reset request.</p>";
+	$message = "<p>Token valid 1 hour.<p>";
+        $message = "<br><p>Here is your password reset link: </p>";
+        $message = "<a href=\"' . $path . '/reset?token=' . $token . '\">$path . '/reset?token=' . $token . '</a>'";
+
+        $this->mail->setFrom('TheShopping@gmail.com');
+        $this->mail->isHTML(true);
+        $this->mail->Subject = $subject;
+        $this->mail->Body = $message;
+        $this->mail->addAddress($email);
+
+        $this->mail->send();
+	$result = true;
+	$_SESSION['success'][] = 'The letter was sent. Check your Email';
+ //User::mailPassword($token);
             } else {
                 $_SESSION['error'][] = "Email or Username aren't found";
             }
@@ -147,5 +182,9 @@ public function actionReset()
                 }
             } else header('Location: /'); //redirect('/');
         } else header('Location: /'); //redirect('/');
+require_once(ROOT . '/views/user/reset.php');
+return true;
 }
+
+        
 }
