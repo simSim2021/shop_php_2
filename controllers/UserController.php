@@ -108,4 +108,44 @@ class UserController {
 
         return true;
     }
+	public function actionPassword()
+    {
+        if (!empty($_POST)) {
+            $this->validate([
+                'data' => 'required|min:2'
+            ]);
+            if ($token = User::createToken()) {
+                User::mailPassword($token);
+            } else {
+                $_SESSION['error'][] = "Email or Username aren't found";
+            }
+	header('Location: /reset/');
+            //redirect();
+        }
+	require_once(ROOT . '/views/user/password.php');
+
+        return true;
+}
+        
+
+public function actionReset()
+    {
+        if (isset($_GET['token']) AND !empty($_GET['token'])) {
+            if (User::checkPwdForReset()) {
+                if (!empty($_POST)) {
+                    if ($_POST['password'] == $_POST['password-repeat']) {
+                        User::updatePwdForReset();
+
+                        $_SESSION['success'][] = 'The password updated successfully!';
+                       header('Location: /login/');
+			 //redirect('login');
+                    } else {
+                        $_SESSION['error'][] = "The passwords don't match";
+                       header('Location: /reset/'); 
+			//redirect();
+                    }
+                }
+            } else header('Location: /'); //redirect('/');
+        } else header('Location: /'); //redirect('/');
+}
 }
